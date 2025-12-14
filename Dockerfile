@@ -11,8 +11,9 @@ RUN apk add --no-cache \
 # Crear directorio de trabajo
 WORKDIR /app
 
-# Copiar package files
+# Copiar package files y patches
 COPY package.json pnpm-lock.yaml ./
+COPY patches ./patches
 
 # Instalar pnpm
 RUN npm install -g pnpm
