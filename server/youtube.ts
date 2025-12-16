@@ -50,11 +50,20 @@ router.post('/download', async (req, res) => {
 
     // Leer el archivo
     const fileBuffer = await readFile(filePath);
-    const fileName = path.basename(filePath).replace('yt_download_', '');
+    let fileName = path.basename(filePath).replace('yt_download_', '');
+    
+    // Sanitizar el nombre del archivo para evitar caracteres inválidos en headers HTTP
+    // Remover o reemplazar caracteres especiales que no son válidos en headers
+    fileName = fileName
+      .replace(/[\u201C\u201D\uFF02]/g, '"')  // Comillas tipográficas a comillas normales
+      .replace(/[\uFF5C\u2502]/g, '-')       // Barras verticales especiales a guiones
+      .replace(/[^\x20-\x7E]/g, '')         // Remover caracteres no-ASCII
+      .replace(/\s+/g, '_')                  // Espacios a guiones bajos
+      .trim();
 
     // Enviar el archivo al cliente
     res.setHeader('Content-Type', 'audio/mpeg');
-    res.setHeader('X-File-Name', fileName);
+    res.setHeader('X-File-Name', encodeURIComponent(fileName));
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
     res.send(fileBuffer);
 
