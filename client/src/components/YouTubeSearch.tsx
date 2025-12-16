@@ -65,7 +65,7 @@ export function YouTubeSearch({ onAudioDownloaded, disabled }: YouTubeSearchProp
     <Card className="border-border/50 bg-card/80 backdrop-blur">
       <CardContent className="p-6">
         <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
-          Buscar en YouTube
+          Buscar canción
         </h2>
         
         <div className="flex gap-2">
