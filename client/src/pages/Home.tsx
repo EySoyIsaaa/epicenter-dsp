@@ -547,16 +547,13 @@ export default function Home() {
                     </Button>
                   </div>
 
-                  {/* Audio Players */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <h3 className="text-xs text-muted-foreground mb-2">Original</h3>
-                      <AudioPlayer audioUrl={result.originalUrl} />
-                    </div>
-                    <div>
-                      <h3 className="text-xs text-muted-foreground mb-2">Procesado</h3>
-                      <AudioPlayer audioUrl={result.processedUrl} />
-                    </div>
+                  {/* Audio Player con comparación A/B */}
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground mb-3">Reproductor con Comparación A/B</h3>
+                    <AudioPlayer 
+                      originalUrl={result.originalUrl} 
+                      processedUrl={result.processedUrl}
+                    />
                   </div>
 
                   {/* Spectrum Visualizers */}
