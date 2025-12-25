@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Download, Zap, Volume2, Info, Heart } from 'lucide-react';
+import { PWAInstallBanner } from '@/components/PWAInstallBanner';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent } from '@/components/ui/card';
@@ -611,6 +612,9 @@ export default function Home() {
           </div>
         </div>
       </main>
+      
+      {/* Banner de Instalación PWA (Solo iPhone) */}
+      <PWAInstallBanner />
     </div>
   );
 }
