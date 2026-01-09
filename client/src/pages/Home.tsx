@@ -38,6 +38,7 @@ export default function Home() {
   const [width, setWidth] = useState(50);
   const [intensity, setIntensity] = useState(50);
   const [balance, setBalance] = useState(50); // 0=voz, 100=bajo
+  const [volume, setVolume] = useState(100); // 100% por defecto, max 150%
   const [activePreset, setActivePreset] = useState('custom');
 
   const {
@@ -96,8 +97,9 @@ export default function Home() {
       width,
       intensity,
       balance,
+      volume,
     });
-  }, [selectedFile, sweepFreq, width, intensity, balance, processAudio]);
+  }, [selectedFile, sweepFreq, width, intensity, balance, volume, processAudio]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -466,10 +468,20 @@ export default function Home() {
                       value={balance}
                       min={0}
                       max={100}
+                      step={1}
                       onChange={handleKnobChange(setBalance)}
                       label="BALANCE"
-                      unit="%"
-                      color="#06b6d4"
+                      color="blue"
+                      disabled={isProcessing}
+                    />
+                    <Knob
+                      value={volume}
+                      min={100}
+                      max={150}
+                      step={1}
+                      onChange={handleKnobChange(setVolume)}
+                      label="VOLUMEN"
+                      color="green"
                       disabled={isProcessing}
                     />
                   </div>
