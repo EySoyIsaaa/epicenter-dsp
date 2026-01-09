@@ -250,14 +250,6 @@ function processAudioData(
     output.push(channelOutput);
   }
   
-  // Normalizar para evitar clipping
-  let maxVal = 0;
-  for (const channel of output) {
-    for (let i = 0; i < channel.length; i++) {
-      maxVal = Math.max(maxVal, Math.abs(channel[i]));
-    }
-  }
-  
   // Aplicar ganancia de volumen final
   const volumeGain = volume / 100;
   for (const channel of output) {
