@@ -7,6 +7,8 @@ interface DSPParams {
   intensity: number;
   balance: number;
   volume: number;
+  reverbEnabled: boolean;
+  reverbIntensity: number;
 }
 
 interface AudioFileInfo {
@@ -97,21 +99,57 @@ function extractEnvelope(signal: Float32Array, sampleRate: number): Float32Array
 }
 
 /**
- * ALGORITMO EPICENTER SEGÚN PATENTE US4698842
- * 
- * 1. Filtrar segundos armónicos (55-120 Hz)
- * 2. Convertir a onda cuadrada (comparador)
- * 3. Dividir frecuencia por 2 (flip-flop)
- * 4. Modular con envolvente original
- * 5. Filtrar paso-bajo
- * 6. Mezclar con original
+ * Implementación de Reverb tipo Schroeder simplificada
+ * Utiliza múltiples líneas de retardo (Comb Filters) en paralelo
+ */
+function applyReverb(
+  signal: Float32Array,
+  sampleRate: number,
+  intensity: number
+): Float32Array {
+  const output = new Float32Array(signal.length);
+  const mix = intensity / 100;
+  
+  // Tiempos de retardo en ms para los filtros peine (comb filters)
+  // Valores típicos para un sonido natural
+  const delayTimes = [29.7, 37.1, 41.1, 43.7];
+  const feedback = 0.7 * mix; // El feedback controla la duración de la cola
+  
+  const combFilters = delayTimes.map(ms => {
+    const delaySamples = Math.floor((ms / 1000) * sampleRate);
+    return {
+      buffer: new Float32Array(delaySamples),
+      index: 0,
+      feedback: feedback
+    };
+  });
+
+  for (let i = 0; i < signal.length; i++) {
+    let combOutput = 0;
+    
+    for (const filter of combFilters) {
+      const delayedSample = filter.buffer[filter.index];
+      filter.buffer[filter.index] = signal[i] + delayedSample * filter.feedback;
+      filter.index = (filter.index + 1) % filter.buffer.length;
+      combOutput += delayedSample;
+    }
+    
+    // Mezclar señal original con la salida de los filtros peine
+    output[i] = signal[i] * (1 - mix * 0.5) + (combOutput / combFilters.length) * mix;
+  }
+
+  return output;
+}
+
+/**
+ * ALGORITMO EPICENTER SEGÚN PATENTE US4698842 + REVERB VOCAL
  */
 function processAudioData(
   audioData: Float32Array[],
   sampleRate: number,
   params: DSPParams
 ): Float32Array[] {
-  const { sweepFreq, width, intensity, balance, volume } = params;
+  const { sweepFreq, width, intensity, balance, volume, reverbEnabled, reverbIntensity } = params;
   
   // Convertir a mono para procesamiento
   const mono = audioData.length > 1
@@ -120,17 +158,12 @@ function processAudioData(
 
   // ============================================
   // PASO 1: Filtro paso-banda para segundos armónicos
-  // Según patente: 55-120 Hz
-  // SWEEP ajusta la frecuencia central
   // ============================================
-  
-  // SWEEP 27-63 Hz → buscar armónicos en 54-126 Hz (el doble)
-  const harmonicCenterFreq = sweepFreq * 2; // Segundo armónico
-  const harmonicBandwidth = 30 + (width * 0.5); // WIDTH controla ancho
+  const harmonicCenterFreq = sweepFreq * 2;
+  const harmonicBandwidth = 30 + (width * 0.5);
   const lowCutoff = Math.max(40, harmonicCenterFreq - harmonicBandwidth);
   const highCutoff = Math.min(200, harmonicCenterFreq + harmonicBandwidth);
   
-  // Aplicar filtro paso-banda (lowpass + highpass)
   let secondHarmonics = applyBiquadFilter(mono, highCutoff, sampleRate, 'lowpass', 1.5);
   secondHarmonics = applyBiquadFilter(secondHarmonics, lowCutoff, sampleRate, 'highpass', 1.5);
   
@@ -156,8 +189,7 @@ function processAudioData(
   }
   
   // ============================================
-  // PASO 3b: Generar subarmónico profundo (f/4) con segundo Flip-Flop
-  // Esto añade profundidad extra manteniendo coherencia armónica
+  // PASO 3b: Generar subarmónico profundo (f/4)
   // ============================================
   const quarterFreqSignal = new Float32Array(mono.length);
   let flipFlopState2 = 1;
@@ -176,20 +208,17 @@ function processAudioData(
   // PASO 4: Filtrar y combinar armónicos
   // ============================================
   const smoothCutoff = sweepFreq * 1.5;
-  const deepCutoff = sweepFreq * 0.8; // Más bajo para el subarmónico
+  const deepCutoff = sweepFreq * 0.8;
   
-  // Filtrar fundamental (f/2)
   let fundamentalBass = applyBiquadFilter(halfFreqSignal, smoothCutoff, sampleRate, 'lowpass', 0.707);
   fundamentalBass = applyBiquadFilter(fundamentalBass, smoothCutoff, sampleRate, 'lowpass', 0.707);
   
-  // Filtrar subarmónico profundo (f/4)
   let deepBass = applyBiquadFilter(quarterFreqSignal, deepCutoff, sampleRate, 'lowpass', 0.5);
   deepBass = applyBiquadFilter(deepBass, deepCutoff, sampleRate, 'lowpass', 0.5);
   
-  // Combinar: 60% fundamental + 40% subarmónico profundo
-  const widthFactor = width / 100; // WIDTH controla mezcla de profundidad
-  const fundamentalWeight = 0.6 - (widthFactor * 0.2); // 0.6 a 0.4
-  const deepWeight = 0.4 + (widthFactor * 0.3); // 0.4 a 0.7
+  const widthFactor = width / 100;
+  const fundamentalWeight = 0.6 - (widthFactor * 0.2);
+  const deepWeight = 0.4 + (widthFactor * 0.3);
   
   let restoredBass = new Float32Array(mono.length);
   for (let i = 0; i < mono.length; i++) {
@@ -197,14 +226,14 @@ function processAudioData(
   }
   
   // ============================================
-  // PASO 5: Normalizar y aplicar ganancia
+  // PASO 5: Normalizar y aplicar ganancia al bajo
   // ============================================
   let maxBass = 0;
   for (let i = 0; i < restoredBass.length; i++) {
     maxBass = Math.max(maxBass, Math.abs(restoredBass[i]));
   }
   
-  const bassGain = (intensity / 100) * 3.5; // INTENSITY controla amplitud (aumentado para más profundidad)
+  const bassGain = (intensity / 100) * 3.5;
   if (maxBass > 0.001) {
     const normalize = 0.8 / maxBass;
     for (let i = 0; i < restoredBass.length; i++) {
@@ -214,10 +243,14 @@ function processAudioData(
   
   // ============================================
   // PASO 6: Preparar canal de voz/medios
-  // Filtro paso-alto para eliminar bajos originales
   // ============================================
   let voiceChannel = applyBiquadFilter(mono, 150, sampleRate, 'highpass', 0.707);
   
+  // APLICAR REVERB SI ESTÁ ACTIVADO (Solo a las voces)
+  if (reverbEnabled) {
+    voiceChannel = applyReverb(voiceChannel, sampleRate, reverbIntensity);
+  }
+
   // Normalizar voz
   let maxVoice = 0;
   for (let i = 0; i < voiceChannel.length; i++) {
@@ -234,8 +267,8 @@ function processAudioData(
   // PASO 7: Mezcla final con BALANCE
   // ============================================
   const balanceFactor = balance / 100;
-  const voiceWeight = 1 - (balanceFactor * 0.7); // 1.0 a 0.3
-  const bassWeight = 0.3 + (balanceFactor * 0.7); // 0.3 a 1.0
+  const voiceWeight = 1 - (balanceFactor * 0.7);
+  const bassWeight = 0.3 + (balanceFactor * 0.7);
   
   const output: Float32Array[] = [];
   
@@ -243,7 +276,6 @@ function processAudioData(
     const channelOutput = new Float32Array(audioData[ch].length);
     
     for (let i = 0; i < channelOutput.length; i++) {
-      // Mezclar voz + bajo restaurado
       channelOutput[i] = voiceChannel[i] * voiceWeight + restoredBass[i] * bassWeight;
     }
     
@@ -283,7 +315,6 @@ function generateSpectrumData(
   sampleRate: number,
   numBins: number = 128
 ): SpectrumData {
-  // Usar una ventana de tiempo en el medio del audio para el análisis
   const fftSize = 4096;
   const startIdx = Math.floor(audioData.length / 2) - Math.floor(fftSize / 2);
   const endIdx = Math.min(startIdx + fftSize, audioData.length);
@@ -291,12 +322,9 @@ function generateSpectrumData(
   const frequencies: number[] = [];
   const magnitudes: number[] = [];
   
-  // Implementación simplificada de FFT para visualización
-  // Nos enfocamos en las frecuencias bajas (0 - 2000 Hz) que es lo que importa para el Epicenter
   const maxAnalysisFreq = 2000; 
   
   for (let k = 0; k < numBins; k++) {
-    // Escala logarítmica para las frecuencias para mejor visualización de bajos
     const minF = 20;
     const maxF = maxAnalysisFreq;
     const freq = minF * Math.pow(maxF / minF, k / (numBins - 1));
@@ -305,9 +333,7 @@ function generateSpectrumData(
     let real = 0, imag = 0;
     let count = 0;
     
-    // DFT discreta optimizada para las frecuencias de interés
-    // Usamos una ventana de Hann para suavizar
-    for (let n = startIdx; n < endIdx; n += 4) { // Salto de 4 para velocidad
+    for (let n = startIdx; n < endIdx; n += 4) {
       const t = (n - startIdx) / fftSize;
       const window = 0.5 * (1 - Math.cos(2 * Math.PI * t));
       const angle = 2 * Math.PI * freq * (n / sampleRate);
@@ -316,48 +342,11 @@ function generateSpectrumData(
       count++;
     }
     
-    magnitudes.push(Math.sqrt(real * real + imag * imag) / count);
+    const mag = Math.sqrt(real * real + imag * imag) / count;
+    magnitudes.push(mag);
   }
 
   return { frequencies, magnitudes };
-}
-
-function createWavBlob(audioData: Float32Array[], sampleRate: number): Blob {
-  const numChannels = audioData.length;
-  const length = audioData[0].length;
-  const buffer = new ArrayBuffer(44 + length * numChannels * 2);
-  const view = new DataView(buffer);
-
-  const writeString = (offset: number, str: string) => {
-    for (let i = 0; i < str.length; i++) {
-      view.setUint8(offset + i, str.charCodeAt(i));
-    }
-  };
-
-  writeString(0, 'RIFF');
-  view.setUint32(4, 36 + length * numChannels * 2, true);
-  writeString(8, 'WAVE');
-  writeString(12, 'fmt ');
-  view.setUint32(16, 16, true);
-  view.setUint16(20, 1, true);
-  view.setUint16(22, numChannels, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * numChannels * 2, true);
-  view.setUint16(32, numChannels * 2, true);
-  view.setUint16(34, 16, true);
-  writeString(36, 'data');
-  view.setUint32(40, length * numChannels * 2, true);
-
-  let offset = 44;
-  for (let i = 0; i < length; i++) {
-    for (let ch = 0; ch < numChannels; ch++) {
-      const sample = Math.max(-1, Math.min(1, audioData[ch][i]));
-      view.setInt16(offset, sample * 0x7FFF, true);
-      offset += 2;
-    }
-  }
-
-  return new Blob([buffer], { type: 'audio/wav' });
 }
 
 export function useAudioProcessor() {
@@ -430,7 +419,7 @@ export function useAudioProcessor() {
         originalData,
         processedData,
         sampleRate: audioBuffer.sampleRate,
-        originalFileName: fileInfo.name.replace(/\.[^/.]+$/, ''), // Remover extensión
+        originalFileName: fileInfo.name.replace(/\.[^/.]+$/, ''),
       });
 
     } catch (err) {
@@ -458,7 +447,6 @@ export function useAudioProcessor() {
 
     const link = document.createElement('a');
     link.href = result.processedUrl;
-    // Usar el nombre del archivo original con sufijo _epicenter
     link.download = `${result.originalFileName}_epicenter.mp3`;
     document.body.appendChild(link);
     link.click();
