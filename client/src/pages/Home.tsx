@@ -574,11 +574,11 @@ export default function Home() {
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
                         <h3 className="text-xs text-muted-foreground mb-2">Espectro Original</h3>
-                        <SpectrumVisualizer data={originalSpectrum} />
+                        <SpectrumVisualizer originalData={originalSpectrum} />
                       </div>
                       <div>
                         <h3 className="text-xs text-muted-foreground mb-2">Espectro Procesado</h3>
-                        <SpectrumVisualizer data={processedSpectrum} />
+                        <SpectrumVisualizer processedData={processedSpectrum} />
                       </div>
                     </div>
                   )}

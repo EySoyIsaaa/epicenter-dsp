@@ -281,28 +281,42 @@ function processAudioData(
 function generateSpectrumData(
   audioData: Float32Array,
   sampleRate: number,
-  numBins: number = 64
+  numBins: number = 128
 ): SpectrumData {
-  const fftSize = 2048;
-  const startIdx = Math.floor(audioData.length / 4);
+  // Usar una ventana de tiempo en el medio del audio para el análisis
+  const fftSize = 4096;
+  const startIdx = Math.floor(audioData.length / 2) - Math.floor(fftSize / 2);
+  const endIdx = Math.min(startIdx + fftSize, audioData.length);
   
   const frequencies: number[] = [];
   const magnitudes: number[] = [];
   
+  // Implementación simplificada de FFT para visualización
+  // Nos enfocamos en las frecuencias bajas (0 - 2000 Hz) que es lo que importa para el Epicenter
+  const maxAnalysisFreq = 2000; 
+  
   for (let k = 0; k < numBins; k++) {
-    const freq = (k / numBins) * (sampleRate / 4);
+    // Escala logarítmica para las frecuencias para mejor visualización de bajos
+    const minF = 20;
+    const maxF = maxAnalysisFreq;
+    const freq = minF * Math.pow(maxF / minF, k / (numBins - 1));
     frequencies.push(freq);
     
     let real = 0, imag = 0;
-    const binSize = Math.floor(fftSize / numBins);
+    let count = 0;
     
-    for (let n = 0; n < binSize && startIdx + n < audioData.length; n++) {
-      const angle = 2 * Math.PI * n * k / fftSize;
-      real += audioData[startIdx + n] * Math.cos(angle);
-      imag += audioData[startIdx + n] * Math.sin(angle);
+    // DFT discreta optimizada para las frecuencias de interés
+    // Usamos una ventana de Hann para suavizar
+    for (let n = startIdx; n < endIdx; n += 4) { // Salto de 4 para velocidad
+      const t = (n - startIdx) / fftSize;
+      const window = 0.5 * (1 - Math.cos(2 * Math.PI * t));
+      const angle = 2 * Math.PI * freq * (n / sampleRate);
+      real += audioData[n] * window * Math.cos(angle);
+      imag += audioData[n] * window * Math.sin(angle);
+      count++;
     }
     
-    magnitudes.push(Math.sqrt(real * real + imag * imag));
+    magnitudes.push(Math.sqrt(real * real + imag * imag) / count);
   }
 
   return { frequencies, magnitudes };
