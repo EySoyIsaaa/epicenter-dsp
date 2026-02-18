@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Download, Zap, Volume2, Info, Heart } from 'lucide-react';
+import { Download, Zap, Volume2, Info, Heart, Smartphone } from 'lucide-react';
 import { PWAInstallBanner } from '@/components/PWAInstallBanner';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -34,6 +34,8 @@ interface AudioFileInfo {
 }
 
 export default function Home() {
+  const appStoreUrl = 'https://play.google.com/store/apps/details?id=com.epicenter.hifi';
+
   const [selectedFile, setSelectedFile] = useState<AudioFileInfo | null>(null);
   const [sweepFreq, setSweepFreq] = useState(45);
   const [width, setWidth] = useState(50);
@@ -123,6 +125,18 @@ export default function Home() {
             </div>
             
             <div className="flex items-center gap-2">
+              <a
+                href={appStoreUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden xl:inline-flex"
+              >
+                <Button className="h-11 px-6 text-base font-bold bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/20 gap-2">
+                  <Smartphone className="w-5 h-5" />
+                  Descargar App Android
+                </Button>
+              </a>
+
               <a 
                 href="https://ko-fi.com/G2G41QLJFO" 
                 target="_blank" 
@@ -199,6 +213,21 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      {/* Botón fijo superior para descarga */}
+      <div className="fixed top-20 left-1/2 -translate-x-1/2 z-40 px-4 w-full max-w-lg">
+        <a
+          href={appStoreUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block"
+        >
+          <Button className="w-full h-12 text-sm md:text-base font-bold bg-green-600 hover:bg-green-700 text-white shadow-xl shadow-green-600/25">
+            <Smartphone className="w-5 h-5 mr-2" />
+            Descarga la App Epicenter DSP en Google Play
+          </Button>
+        </a>
+      </div>
 
       <main className="container py-8">
         <div className="grid lg:grid-cols-[1fr_300px] gap-8">
@@ -462,6 +491,22 @@ export default function Home() {
           </div>
         </div>
       </main>
+
+      {/* Pantalla flotante de descarga Google Play */}
+      <div className="fixed bottom-4 right-4 z-40 w-[300px] sm:w-[360px] rounded-2xl border border-border/60 bg-card/95 backdrop-blur-md shadow-2xl shadow-black/40 p-4 space-y-3">
+        <p className="text-xs uppercase tracking-wider text-muted-foreground">Disponible para Android</p>
+        <h3 className="text-sm font-semibold text-foreground leading-snug">
+          Lleva Epicenter DSP Player en tu celular y procesa tu música donde quieras.
+        </h3>
+        <a href={appStoreUrl} target="_blank" rel="noopener noreferrer" className="block">
+          <img
+            src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+            alt="Get it on Google Play"
+            className="w-full max-w-[260px] mx-auto drop-shadow-lg"
+            loading="lazy"
+          />
+        </a>
+      </div>
       
       {/* Banner de Instalación PWA (Solo iPhone) */}
       <PWAInstallBanner />
