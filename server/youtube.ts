@@ -21,7 +21,24 @@ router.post('/download', async (req, res) => {
   
   try {
     // Ejecutar yt-dlp para descargar el audio
-    const command = `yt-dlp -x --audio-format mp3 --embed-thumbnail -o "${outputTemplate}" "ytsearch:${query}"`;
+    const jsRuntime = 'node';
+    const command = [
+      'yt-dlp',
+      '--no-playlist',
+      '--js-runtimes',
+      jsRuntime,
+      '--extractor-args',
+      '"youtube:player_client=android"',
+      '-f',
+      'bestaudio/best',
+      '-x',
+      '--audio-format',
+      'mp3',
+      '--embed-thumbnail',
+      '-o',
+      `"${outputTemplate}"`,
+      `"ytsearch1:${query}"`
+    ].join(' ');
     
     console.log('Executing:', command);
     const { stdout, stderr } = await execAsync(command, { 
