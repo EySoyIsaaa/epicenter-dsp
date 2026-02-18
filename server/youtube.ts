@@ -1,13 +1,92 @@
-import { Router } from 'express';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import { unlink, readFile } from 'fs/promises';
+import { execFile } from 'child_process';
 import { existsSync } from 'fs';
-import path from 'path';
+import { readFile, unlink } from 'fs/promises';
 import { tmpdir } from 'os';
+import path from 'path';
+import { Router } from 'express';
+import { promisify } from 'util';
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 const router = Router();
+
+const MAX_BUFFER = 50 * 1024 * 1024;
+const TIMEOUT_MS = 120000;
+
+const CLIENT_FALLBACKS = [
+  'youtube:player_client=android',
+  'youtube:player_client=tv_embedded,ios',
+  'youtube:player_client=web_safari,ios',
+];
+
+async function downloadWithYtDlp(query: string, outputTemplate: string, tempDir: string) {
+  const cookiesFile = process.env.YTDLP_COOKIES_FILE;
+  const baseArgs = [
+    '--no-playlist',
+    '--js-runtimes',
+    'node',
+    '-f',
+    'bestaudio/best',
+    '-x',
+    '--audio-format',
+    'mp3',
+    '--embed-thumbnail',
+    '--print',
+    'after_move:filepath',
+    '-o',
+    outputTemplate,
+  ];
+
+  if (cookiesFile && existsSync(cookiesFile)) {
+    baseArgs.push('--cookies', cookiesFile);
+  }
+
+  let lastError: unknown = null;
+
+  for (const extractorArgs of CLIENT_FALLBACKS) {
+    const args = [
+      ...baseArgs,
+      '--extractor-args',
+      extractorArgs,
+      `ytsearch1:${query}`,
+    ];
+
+    console.log('Executing: yt-dlp', args.join(' '));
+
+    try {
+      const { stdout, stderr } = await execFileAsync('yt-dlp', args, {
+        maxBuffer: MAX_BUFFER,
+        timeout: TIMEOUT_MS,
+      });
+
+      if (stderr) {
+        console.error('yt-dlp stderr:', stderr);
+      }
+
+      const lines = stdout
+        .split('\n')
+        .map(line => line.trim())
+        .filter(Boolean);
+      const resolvedPath = lines.reverse().find(line => line.endsWith('.mp3')) || null;
+
+      if (resolvedPath && existsSync(resolvedPath)) {
+        return resolvedPath;
+      }
+
+      const { stdout: lsOutput } = await execFileAsync('bash', ['-lc', `ls -t "${tempDir}"/yt_download_*.mp3 2>/dev/null | head -1`]);
+      const fallbackPath = lsOutput.trim();
+      if (fallbackPath && existsSync(fallbackPath)) {
+        return fallbackPath;
+      }
+
+      throw new Error('No se pudo encontrar el archivo mp3 descargado');
+    } catch (error) {
+      lastError = error;
+      console.error(`yt-dlp attempt failed (${extractorArgs}):`, error);
+    }
+  }
+
+  throw lastError;
+}
 
 router.post('/download', async (req, res) => {
   const { query } = req.body;
@@ -18,80 +97,39 @@ router.post('/download', async (req, res) => {
 
   const tempDir = tmpdir();
   const outputTemplate = path.join(tempDir, 'yt_download_%(title)s.%(ext)s');
-  
+
   try {
-    // Ejecutar yt-dlp para descargar el audio
-    const jsRuntime = 'node';
-    const command = [
-      'yt-dlp',
-      '--no-playlist',
-      '--js-runtimes',
-      jsRuntime,
-      '--extractor-args',
-      '"youtube:player_client=android"',
-      '-f',
-      'bestaudio/best',
-      '-x',
-      '--audio-format',
-      'mp3',
-      '--embed-thumbnail',
-      '-o',
-      `"${outputTemplate}"`,
-      `"ytsearch1:${query}"`
-    ].join(' ');
-    
-    console.log('Executing:', command);
-    const { stdout, stderr } = await execAsync(command, { 
-      maxBuffer: 50 * 1024 * 1024, // 50MB buffer
-      timeout: 120000 // 2 minutos timeout
-    });
-    
-    console.log('yt-dlp output:', stdout);
-    if (stderr) console.error('yt-dlp stderr:', stderr);
+    const filePath = await downloadWithYtDlp(query, outputTemplate, tempDir);
 
-    // Buscar el archivo descargado
-    const outputMatch = stdout.match(/\[ExtractAudio\] Destination: (.+\.mp3)/);
-    let filePath: string | null = null;
-
-    if (outputMatch) {
-      filePath = outputMatch[1].trim();
-    } else {
-      // Intentar encontrar el archivo en el directorio temporal
-      const { stdout: lsOutput } = await execAsync(`ls -t "${tempDir}"/yt_download_*.mp3 | head -1`);
-      filePath = lsOutput.trim();
-    }
-
-    if (!filePath || !existsSync(filePath)) {
-      throw new Error('No se pudo encontrar el archivo descargado');
-    }
-
-    // Leer el archivo
     const fileBuffer = await readFile(filePath);
     let fileName = path.basename(filePath).replace('yt_download_', '');
-    
-    // Sanitizar el nombre del archivo para evitar caracteres inválidos en headers HTTP
-    // Remover o reemplazar caracteres especiales que no son válidos en headers
+
     fileName = fileName
-      .replace(/[\u201C\u201D\uFF02]/g, '"')  // Comillas tipográficas a comillas normales
-      .replace(/[\uFF5C\u2502]/g, '-')       // Barras verticales especiales a guiones
-      .replace(/[^\x20-\x7E]/g, '')         // Remover caracteres no-ASCII
-      .replace(/\s+/g, '_')                  // Espacios a guiones bajos
+      .replace(/[\u201C\u201D\uFF02]/g, '"')
+      .replace(/[\uFF5C\u2502]/g, '-')
+      .replace(/[^\x20-\x7E]/g, '')
+      .replace(/\s+/g, '_')
       .trim();
 
-    // Enviar el archivo al cliente
     res.setHeader('Content-Type', 'audio/mpeg');
     res.setHeader('X-File-Name', encodeURIComponent(fileName));
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
     res.send(fileBuffer);
 
-    // Limpiar el archivo temporal después de enviarlo
     await unlink(filePath).catch(err => console.error('Error deleting temp file:', err));
-
   } catch (error) {
     console.error('Error downloading from YouTube:', error);
-    res.status(500).json({ 
-      error: 'Error al descargar la canción desde YouTube',
-      details: error instanceof Error ? error.message : 'Unknown error'
+
+    const rawMessage = error instanceof Error ? error.message : 'Unknown error';
+    const isBotBlock =
+      rawMessage.includes('Sign in to confirm you\'re not a bot') ||
+      rawMessage.includes('Use --cookies-from-browser or --cookies');
+
+    res.status(500).json({
+      error: isBotBlock
+        ? 'YouTube bloqueó la descarga automática. Configura cookies en el servidor (YTDLP_COOKIES_FILE) para continuar.'
+        : 'Error al descargar la canción desde YouTube',
+      details: rawMessage,
     });
   }
 });
