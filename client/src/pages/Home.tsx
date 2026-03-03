@@ -204,16 +204,18 @@ export default function Home() {
           <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:items-end">
             <div className="space-y-5">
               <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">
-                Premium Audio Lab
+                Epicenter Harmonic Bass Restoration
               </p>
               <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-zinc-50 md:text-5xl">
-                Un rediseño minimalista para una experiencia Hi-Fi elegante y
-                moderna.
+                Restauración armónica de baja frecuencia para sistemas que
+                exigen precisión, profundidad y control real.
               </h2>
               <p className="max-w-2xl text-sm leading-relaxed text-zinc-400 md:text-base">
-                Interfaz limpia, visual académico y flujo optimizado para
-                audiófilos. El algoritmo de restauración de bajos permanece
-                intacto; mejoramos únicamente la experiencia visual y de uso.
+                Epicenter DSP no hace “bass boost”: reconstruye información
+                fundamental perdida en compresión y masterización. Esta
+                implementación fue desarrollada por Abraham Isaias Garcia
+                Barragan, conservando la esencia técnica del Epicenter y
+                llevándola a un flujo moderno para audiófilos.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row">
                 <a
@@ -482,12 +484,21 @@ export default function Home() {
             <Card className="border-white/10 bg-[#0d1117]">
               <CardContent className="space-y-4 p-5">
                 <h3 className="text-xs uppercase tracking-[0.2em] text-zinc-500">
-                  Información
+                  Resumen técnico
                 </h3>
                 <div className="space-y-2 text-xs leading-relaxed text-zinc-400">
                   <p>
-                    Restauración de bajos perdidos por compresión o
-                    masterización.
+                    Analiza la señal entrante y sintetiza fundamentales
+                    coherentes en el rango bajo, en lugar de solo amplificar
+                    graves existentes.
+                  </p>
+                  <p>
+                    Útil para recuperar cuerpo en material comprimido (MP3,
+                    streaming y masters con low-end limitado).
+                  </p>
+                  <p>
+                    Implementado por Abraham Isaias Garcia Barragan para una
+                    experiencia clara, precisa y orientada a Sound Quality.
                   </p>
                   <p>Ideal para Regional, Banda, Rock y Pop.</p>
                   <p>Exportación final en MP3 320 kbps.</p>
@@ -529,33 +540,58 @@ export default function Home() {
               </DialogTrigger>
               <DialogContent className="max-h-[80vh] max-w-4xl overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Acerca de Epicenter DSP</DialogTitle>
+                  <DialogTitle>Epicenter de AudioControl</DialogTitle>
                   <DialogDescription>
-                    Procesador de audio profesional basado en la patente
-                    US4698842
+                    Restaurador armónico inteligente de baja frecuencia,
+                    implementado por Abraham Isaias Garcia Barragan.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-6 text-sm text-muted-foreground">
                   <section>
                     <h3 className="mb-3 text-lg font-semibold text-foreground">
-                      ¿Qué es Epicenter DSP?
+                      Restaurador armónico, no “bass boost”
                     </h3>
                     <p>
-                      <strong className="text-foreground">Epicenter DSP</strong>{" "}
-                      es una recreación digital del legendario AudioControl
-                      Epicenter, un procesador de restauración de bajos usado en
-                      car audio profesional.
+                      El Epicenter de AudioControl no es un simple procesador de
+                      graves; es un restaurador armónico inteligente de bajas
+                      frecuencias, diseñado para reconstruir información
+                      eliminada durante compresión, masterización comercial o
+                      limitación dinámica.
                     </p>
                   </section>
                   <section>
                     <h3 className="mb-3 text-lg font-semibold text-foreground">
-                      Historia y tecnología
+                      ¿Cómo trabaja técnicamente?
                     </h3>
                     <p>
-                      El Epicenter original fue desarrollado por AudioControl y
-                      patentado bajo{" "}
-                      <strong className="text-foreground">US4698842</strong>.
+                      Analiza en tiempo real el contenido espectral de la señal
+                      entrante. Cuando detecta fundamentales débiles o ausentes
+                      entre ~27 Hz y 63 Hz (según ajuste), genera armónicos
+                      musicalmente coherentes a partir de frecuencias superiores
+                      presentes en la señal original, manteniendo fase y
+                      coherencia temporal.
                     </p>
+                  </section>
+                  <section>
+                    <h3 className="mb-3 text-lg font-semibold text-foreground">
+                      ¿Por qué importa en Sound Quality?
+                    </h3>
+                    <div className="space-y-2">
+                      <p>
+                        Recupera cuerpo en grabaciones comprimidas y mejora la
+                        sensación de profundidad en sistemas sellados.
+                      </p>
+                      <p>
+                        Optimiza el rendimiento subjetivo del subwoofer sin
+                        saturar la etapa de potencia y mejora percepción
+                        dinámica en cabina.
+                      </p>
+                      <p>
+                        En un sistema bien calibrado no se percibe como efecto:
+                        se percibe como restauración natural del fundamento
+                        armónico.
+                      </p>
+                    </div>
                   </section>
                   <section>
                     <h3 className="mb-3 text-lg font-semibold text-foreground">
