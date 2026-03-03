@@ -165,25 +165,25 @@ export default function Home() {
   ]);
 
   return (
-    <div className="min-h-screen bg-[#07090d] text-zinc-100">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#07090d]/95 backdrop-blur">
+    <div className="min-h-screen bg-[#030711] text-blue-50">
+      <header className="sticky top-0 z-50 border-b border-blue-400/20 bg-[#030711]/95 backdrop-blur">
         <div className="container py-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-[#11141a]">
-                <Zap className="h-5 w-5 text-zinc-200" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-400/30 bg-[#081124]">
+                <Zap className="h-5 w-5 text-blue-100" />
               </div>
               <div>
                 <h1 className="text-lg font-semibold tracking-wide">
                   EPICENTER DSP
                 </h1>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-blue-200">
                   Restauración de bajos con enfoque profesional
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[11px] uppercase tracking-wider text-zinc-400">
+            <div className="flex items-center gap-2 rounded-full border border-blue-400/20 bg-blue-400/[0.08] px-3 py-1.5 text-[11px] uppercase tracking-wider text-blue-200">
               {isDesktop ? (
                 <Monitor className="h-4 w-4" />
               ) : (
@@ -200,17 +200,17 @@ export default function Home() {
       </header>
 
       <main className="container py-6 md:py-10">
-        <section className="rounded-3xl border border-white/10 bg-[#0d1117] p-6 md:p-10">
+        <section className="rounded-3xl border border-blue-400/20 bg-[#071225] p-6 md:p-10">
           <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:items-end">
             <div className="space-y-5">
-              <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">
+              <p className="text-xs uppercase tracking-[0.2em] text-blue-400">
                 Epicenter Harmonic Bass Restoration
               </p>
-              <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-zinc-50 md:text-5xl">
+              <h2 className="max-w-3xl text-3xl font-semibold leading-tight text-blue-50 md:text-5xl">
                 Restauración armónica de baja frecuencia para sistemas que
                 exigen precisión, profundidad y control real.
               </h2>
-              <p className="max-w-2xl text-sm leading-relaxed text-zinc-400 md:text-base">
+              <p className="max-w-2xl text-sm leading-relaxed text-blue-200 md:text-base">
                 Epicenter DSP no hace “bass boost”: reconstruye información
                 fundamental perdida en compresión y masterización. Esta
                 implementación fue desarrollada por Abraham Isaias Garcia
@@ -224,7 +224,7 @@ export default function Home() {
                   rel="noopener noreferrer"
                   className="w-full sm:w-auto"
                 >
-                  <Button className="h-11 w-full bg-zinc-100 px-6 font-semibold text-zinc-900 hover:bg-white sm:w-auto">
+                  <Button className="h-11 w-full bg-blue-500 px-6 font-semibold text-white hover:bg-blue-600 sm:w-auto">
                     <Smartphone className="mr-2 h-4 w-4" />
                     Descargar App Android
                     <ArrowUpRight className="ml-2 h-4 w-4" />
@@ -238,7 +238,7 @@ export default function Home() {
                 >
                   <Button
                     variant="outline"
-                    className="h-11 w-full border-white/20 bg-transparent text-zinc-200 hover:bg-white/5 sm:w-auto"
+                    className="h-11 w-full border-blue-300/35 bg-transparent text-blue-100 hover:bg-blue-400/5 sm:w-auto"
                   >
                     <Heart className="mr-2 h-4 w-4" />
                     Apoya al proyecto
@@ -247,12 +247,12 @@ export default function Home() {
               </div>
             </div>
 
-            <Card className="border-white/10 bg-[#121821]">
+            <Card className="border-blue-400/20 bg-[#0b1c3a]">
               <CardContent className="space-y-4 p-5">
-                <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">
+                <p className="text-xs uppercase tracking-[0.2em] text-blue-400">
                   Descarga oficial
                 </p>
-                <p className="text-sm leading-relaxed text-zinc-300">
+                <p className="text-sm leading-relaxed text-blue-200">
                   Instala Epicenter DSP Player en tu Android y accede a la
                   experiencia completa desde tu dispositivo móvil.
                 </p>
@@ -278,7 +278,7 @@ export default function Home() {
           <div className="space-y-6">
             <AdSense adSlot="1111111111" adFormat="horizontal" />
 
-            <Card className="border-white/10 bg-[#0d1117]">
+            <Card className="border-blue-400/20 bg-[#071225]">
               <CardContent className="p-5 md:p-6">
                 <YouTubeSearch
                   onAudioDownloaded={handleYouTubeDownload}
@@ -287,9 +287,9 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="border-white/10 bg-[#0d1117]">
+            <Card className="border-blue-400/20 bg-[#071225]">
               <CardContent className="p-5 md:p-6">
-                <h3 className="mb-4 text-xs uppercase tracking-[0.2em] text-zinc-500">
+                <h3 className="mb-4 text-xs uppercase tracking-[0.2em] text-blue-400">
                   Subir archivo
                 </h3>
                 <FileUploader
@@ -301,7 +301,7 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="border-white/10 bg-[#0d1117]">
+            <Card className="border-blue-400/20 bg-[#071225]">
               <CardContent className="space-y-7 p-5 md:p-6">
                 <PresetSelector
                   activePreset={activePreset}
@@ -317,7 +317,7 @@ export default function Home() {
                     onChange={handleKnobChange(setSweepFreq)}
                     label="SWEEP"
                     unit="Hz"
-                    color="#f4f4f5"
+                    color="#60a5fa"
                     disabled={isProcessing}
                   />
                   <Knob
@@ -327,7 +327,7 @@ export default function Home() {
                     onChange={handleKnobChange(setWidth)}
                     label="WIDTH"
                     unit="%"
-                    color="#d4d4d8"
+                    color="#3b82f6"
                     disabled={isProcessing}
                   />
                   <Knob
@@ -337,7 +337,7 @@ export default function Home() {
                     onChange={handleKnobChange(setIntensity)}
                     label="INTENSITY"
                     unit="%"
-                    color="#a1a1aa"
+                    color="#2563eb"
                     disabled={isProcessing}
                   />
                   <Knob
@@ -355,7 +355,7 @@ export default function Home() {
                     max={150}
                     onChange={handleKnobChange(setVolume)}
                     label="VOLUMEN"
-                    color="green"
+                    color="#0ea5e9"
                     disabled={isProcessing}
                   />
 
@@ -370,7 +370,7 @@ export default function Home() {
                       color="#ffffff"
                       disabled={isProcessing || !reverbEnabled}
                     />
-                    <div className="flex items-center gap-2 rounded-full border border-white/15 px-3 py-2">
+                    <div className="flex items-center gap-2 rounded-full border border-blue-400/30 px-3 py-2">
                       <Switch
                         id="reverb-mode"
                         checked={reverbEnabled}
@@ -379,7 +379,7 @@ export default function Home() {
                       />
                       <Label
                         htmlFor="reverb-mode"
-                        className="text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-400"
+                        className="text-[10px] font-bold uppercase tracking-[0.15em] text-blue-200"
                       >
                         {reverbEnabled ? "ON" : "OFF"}
                       </Label>
@@ -387,14 +387,14 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="grid gap-2 text-xs text-zinc-500 sm:grid-cols-3">
-                  <div className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2">
+                <div className="grid gap-2 text-xs text-blue-400 sm:grid-cols-3">
+                  <div className="rounded-lg border border-blue-400/20 bg-blue-400/[0.06] px-3 py-2">
                     Entrada: {selectedFile ? "lista" : "sin archivo"}
                   </div>
-                  <div className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2">
+                  <div className="rounded-lg border border-blue-400/20 bg-blue-400/[0.06] px-3 py-2">
                     Proceso: {isProcessing ? "activo" : "en espera"}
                   </div>
-                  <div className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2">
+                  <div className="rounded-lg border border-blue-400/20 bg-blue-400/[0.06] px-3 py-2">
                     Salida: {result ? "disponible" : "pendiente"}
                   </div>
                 </div>
@@ -402,7 +402,7 @@ export default function Home() {
                 <Button
                   onClick={handleProcess}
                   disabled={!selectedFile || isProcessing}
-                  className="h-12 w-full bg-zinc-100 font-semibold text-zinc-900 hover:bg-white"
+                  className="h-12 w-full bg-blue-500 font-semibold text-white hover:bg-blue-600"
                 >
                   {isProcessing ? (
                     <>
@@ -420,7 +420,7 @@ export default function Home() {
                 {isProcessing && (
                   <div>
                     <Progress value={progress} className="h-2" />
-                    <p className="mt-2 text-center text-xs text-zinc-400">
+                    <p className="mt-2 text-center text-xs text-blue-200">
                       {progress}% completado
                     </p>
                   </div>
@@ -435,15 +435,15 @@ export default function Home() {
             </Card>
 
             {result && (
-              <Card className="border-white/10 bg-[#0d1117]">
+              <Card className="border-blue-400/20 bg-[#071225]">
                 <CardContent className="space-y-5 p-5 md:p-6">
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <h2 className="text-sm uppercase tracking-[0.15em] text-zinc-400">
+                    <h2 className="text-sm uppercase tracking-[0.15em] text-blue-200">
                       Resultado del procesamiento
                     </h2>
                     <Button
                       onClick={downloadProcessed}
-                      className="bg-zinc-100 font-semibold text-zinc-900 hover:bg-white"
+                      className="bg-blue-500 font-semibold text-white hover:bg-blue-600"
                     >
                       <Download className="mr-2 h-4 w-4" />
                       Descargar MP3
@@ -458,13 +458,13 @@ export default function Home() {
                   {originalSpectrum && processedSpectrum && (
                     <div className="grid gap-4 md:grid-cols-2">
                       <div>
-                        <h3 className="mb-2 text-xs text-zinc-500">
+                        <h3 className="mb-2 text-xs text-blue-400">
                           Espectro original
                         </h3>
                         <SpectrumVisualizer originalData={originalSpectrum} />
                       </div>
                       <div>
-                        <h3 className="mb-2 text-xs text-zinc-500">
+                        <h3 className="mb-2 text-xs text-blue-400">
                           Espectro procesado
                         </h3>
                         <SpectrumVisualizer processedData={processedSpectrum} />
@@ -481,12 +481,12 @@ export default function Home() {
           <aside className="space-y-6">
             <AdSense adSlot="3333333333" adFormat="vertical" />
 
-            <Card className="border-white/10 bg-[#0d1117]">
+            <Card className="border-blue-400/20 bg-[#071225]">
               <CardContent className="space-y-4 p-5">
-                <h3 className="text-xs uppercase tracking-[0.2em] text-zinc-500">
+                <h3 className="text-xs uppercase tracking-[0.2em] text-blue-400">
                   Resumen técnico
                 </h3>
-                <div className="space-y-2 text-xs leading-relaxed text-zinc-400">
+                <div className="space-y-2 text-xs leading-relaxed text-blue-200">
                   <p>
                     Analiza la señal entrante y sintetiza fundamentales
                     coherentes en el rango bajo, en lugar de solo amplificar
@@ -506,12 +506,12 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="border-white/10 bg-[#0d1117]">
+            <Card className="border-blue-400/20 bg-[#071225]">
               <CardContent className="space-y-3 p-5">
-                <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">
+                <p className="text-xs uppercase tracking-[0.2em] text-blue-400">
                   Acceso directo
                 </p>
-                <h4 className="text-sm font-medium text-zinc-100">
+                <h4 className="text-sm font-medium text-blue-50">
                   Descarga la app oficial en Google Play.
                 </h4>
                 <a
@@ -520,7 +520,7 @@ export default function Home() {
                   rel="noopener noreferrer"
                   className="block"
                 >
-                  <Button className="w-full bg-zinc-100 font-semibold text-zinc-900 hover:bg-white">
+                  <Button className="w-full bg-blue-500 font-semibold text-white hover:bg-blue-600">
                     <Smartphone className="mr-2 h-4 w-4" />
                     Ir a Google Play
                   </Button>
@@ -532,7 +532,7 @@ export default function Home() {
               <DialogTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full border-white/15 bg-transparent text-zinc-200 hover:bg-white/5"
+                  className="w-full border-blue-400/30 bg-transparent text-blue-100 hover:bg-blue-400/5"
                 >
                   <Info className="mr-2 h-4 w-4" />
                   Acerca de Epicenter DSP
@@ -634,13 +634,13 @@ export default function Home() {
       </main>
 
       {isPortraitMobile && (
-        <div className="fixed inset-x-3 bottom-3 z-40 rounded-xl border border-white/10 bg-[#0d1117]/95 p-3 backdrop-blur">
+        <div className="fixed inset-x-3 bottom-3 z-40 rounded-xl border border-blue-400/20 bg-[#071225]/95 p-3 backdrop-blur">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-xs text-zinc-300">
+            <p className="text-xs text-blue-200">
               Descarga la app Epicenter DSP para Android.
             </p>
             <a href={appStoreUrl} target="_blank" rel="noopener noreferrer">
-              <Button className="h-8 bg-zinc-100 px-4 text-xs font-semibold text-zinc-900 hover:bg-white">
+              <Button className="h-8 bg-blue-500 px-4 text-xs font-semibold text-white hover:bg-blue-400">
                 Descargar
               </Button>
             </a>
