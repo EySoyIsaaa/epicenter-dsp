@@ -500,6 +500,8 @@ export default function Home() {
                     Implementado por Abraham Isaias Garcia Barragan para una
                     experiencia clara, precisa y orientada a Sound Quality.
                   </p>
+                  <p>Ideal para Regional, Banda, Rock y Pop.</p>
+                  <p>Exportación final en MP3 320 kbps.</p>
                 </div>
               </CardContent>
             </Card>
